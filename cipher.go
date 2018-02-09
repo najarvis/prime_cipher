@@ -3,23 +3,33 @@ package main
 import (
     "fmt"
     "sort"
+    "os"
+    "strconv"
 )
 
 func main() {
-    fmt.Print("Enter max number: ")
     var num int
-    fmt.Scan(&num)
 
-    fmt.Println(GetPrimes(num))
+    if (len(os.Args) == 1) {
+        fmt.Print("Enter max number: ")
+        fmt.Scan(&num)
+    } else {
+        var err error
+        num, err = strconv.Atoi(os.Args[1])
+        if err != nil {
+            fmt.Println("Usage: ./prime_cipher.exe [max_number]")
+            return
+        }
+    }
+
+    fmt.Println(sortAndPrintSet(GetPrimes(num)))
 
 }
 
 // GetPrimes is an implementation of the Sieve of Eratosthenes to generate primes in Golang.
 // It creates a set of all (odd) numbers up to an input num, then goes through each number
-// in the set in ascending order and removes all multiples from the set. A slice containing
-// the primes in ascending order is returned.
-func GetPrimes(num int) []int {
-    var primes []int
+// in the set in ascending order and removes all multiples from the set. A set of primes is returned.
+func GetPrimes(num int) map[int]struct{} {
 
     // There isn't a set datastructure, so this int->empty struct map will do. (Basically the same thing).
     prime_map := make(map[int]struct{})
@@ -44,9 +54,14 @@ func GetPrimes(num int) []int {
         index++
     }
 
+    return prime_map;
+}
+
+func sortAndPrintSet(m map[int]struct{}) (primes []int) {
+
     // loop through all int->empty struct pairs and if the key is present then add it to our slice of primes.
     // These lines would be something like [k for k in prime_map] in python
-    for k, _ := range prime_map {
+    for k, _ := range m {
         primes = append(primes, k)
     }
 
